@@ -5,7 +5,6 @@ export default function Dashboard() {
   const [usuario, setUsuario] = useState("Usuário");
   const [recentes, setRecentes] = useState([]);
   const [agendados, setAgendados] = useState([]);
-  const [obras, setObras] = useState([]);
   const [cards, setCards] = useState([]);
 
   useEffect(() => {
@@ -19,8 +18,6 @@ export default function Dashboard() {
     setTarefasPendentes(pendentes);
 
     const todas = JSON.parse(localStorage.getItem("atividades") || "[]");
-    const listaObras = JSON.parse(localStorage.getItem("obras") || "[]");
-    setObras(listaObras);
 
     const hoje = new Date();
     const seteDiasAtras = new Date();
@@ -61,10 +58,15 @@ export default function Dashboard() {
     const ativosBalancinho = contarAtivos("Balancinho");
     const ativosMiniGrua = contarAtivos("Mini Grua");
 
+    const mesAtual = new Date().toISOString().slice(0, 7);
+    const servicosDoMes = todas.filter(
+      (a) => a.dataLiberacao?.slice(0, 7) === mesAtual && a.servico !== "Manutenção"
+    ).length;
+
     setCards([
       { titulo: "Serviços nos últimos 7 dias", valor: atividadesRecentes.length, cor: "bg-blue-100" },
       { titulo: "Serviços Agendados", valor: atividadesAgendadas.length, cor: "bg-yellow-100" },
-      { titulo: "Obras Cadastradas", valor: listaObras.length, cor: "bg-green-100" },
+      { titulo: "Serviços do Mês", valor: servicosDoMes, cor: "bg-green-100" },
       { titulo: "Balancinhos Ativos", valor: ativosBalancinho, cor: "bg-purple-100" },
       { titulo: "Mini Gruas Ativas", valor: ativosMiniGrua, cor: "bg-purple-200" },
     ]);
@@ -119,8 +121,7 @@ export default function Dashboard() {
                 {a.equipamento === "Balancinho" && a.tamanho ? ` [${a.tamanho}m]` : ""}<br />
                 {a.construtora} / {a.obra} <br />
                 Agendado: {formatarData(a.dataAgendamento)}{" "}
-{a.iniciado && <span className="text-orange-600 font-semibold">(Em Andamento)</span>}
-
+                {a.iniciado && <span className="text-orange-600 font-semibold">(Em Andamento)</span>}
               </li>
             ))}
           </ul>
